@@ -13,12 +13,7 @@ from pydantic import BaseModel, Field, ValidationError, model_validator
 
 
 class ContactType(Enum):
-    """
-    Enumeration of recognised alien contact categories.
-
-    Using an Enum forces callers to pick an exact value from a fixed set,
-    preventing typos like "Radio" or "RADIO" from slipping through.
-    """
+    """Enumeration of recognised alien contact categories."""
 
     RADIO = "radio"
     VISUAL = "visual"
@@ -27,12 +22,7 @@ class ContactType(Enum):
 
 
 class AlienContact(BaseModel):
-    """
-    Pydantic model representing a single alien contact report.
-
-    Field-level constraints handle basic range/length checks.
-    The @model_validator handles cross-field business rules.
-    """
+    """Pydantic model representing a single alien contact report."""
 
     contact_id: str = Field(..., min_length=5, max_length=15)
     timestamp: datetime = Field(...)
@@ -49,12 +39,6 @@ class AlienContact(BaseModel):
         """
         Enforce cross-field validation rules after all individual fields pass.
 
-        Rules:
-        1. contact_id must start with "AC".
-        2. Physical contacts must be verified.
-        3. Telepathic contacts require at least 3 witnesses.
-        4. Strong signals (> 7.0) must include a received message.
-
         Returns
         -------
         AlienContact
@@ -66,14 +50,20 @@ class AlienContact(BaseModel):
             If any business rule is violated.
         """
         if not self.contact_id.startswith("AC"):
-            raise ValueError("Contact ID must start with 'AC' (Alien Contact)")
+            raise ValueError(
+                "Contact ID must start with 'AC' (Alien Contact)"
+            )
 
         if self.contact_type == ContactType.PHYSICAL and not self.is_verified:
             raise ValueError("Physical contact reports must be verified")
-        condition = ContactType.TELEPATHIC and self.witness_count < 3
-        if self.contact_type == condition:
+
+        if (
+            self.contact_type == ContactType.TELEPATHIC
+            and self.witness_count < 3
+        ):
             raise ValueError(
-                "Telepathic contact requires at least 3 witnesses")
+                "Telepathic contact requires at least 3 witnesses"
+            )
 
         if self.signal_strength > 7.0 and self.message_received is None:
             raise ValueError(
@@ -146,8 +136,12 @@ def main() -> None:
             is_verified=False,
         )
     except ValidationError as error:
-        first_error_message: str = error.errors()[0]["msg"]
-        clean_message: str = first_error_message.replace("Value error, ", "")
+        raw_msg: str = error.errors()[0]["msg"]
+        prefix: str = "Value error, "
+        if raw_msg.startswith(prefix):
+            clean_message: str = raw_msg[len(prefix):]
+        else:
+            clean_message = raw_msg
         print(clean_message)
 
 

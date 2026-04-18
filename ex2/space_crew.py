@@ -73,11 +73,10 @@ class SpaceMission(BaseModel):
         ValueError
             If any safety requirement is violated.
         """
-        # Rule 1: mission ID prefix
+
         if not self.mission_id.startswith("M"):
             raise ValueError("Mission ID must start with 'M'")
 
-        # Rule 2: must have a senior commanding officer
         high_ranking_roles = {Rank.CAPTAIN, Rank.COMMANDER}
         has_senior_officer: bool = any(
             member.rank in high_ranking_roles for member in self.crew
@@ -87,7 +86,6 @@ class SpaceMission(BaseModel):
                 "Mission must have at least one Commander or Captain"
             )
 
-        # Rule 3: long missions need an experienced majority
         if self.duration_days > 365:
             experienced_count: int = sum(
                 1 for member in self.crew if member.years_experience >= 5
@@ -99,7 +97,6 @@ class SpaceMission(BaseModel):
                     "of crew to have 5+ years of experience"
                 )
 
-        # Rule 4: all assigned crew must be active
         inactive_names: List[str] = [
             member.name for member in self.crew if not member.is_active
         ]
@@ -153,7 +150,6 @@ def main() -> None:
     print("Space Mission Crew Validation")
     print("=" * 41)
 
-    # Build crew members individually first
     commander_sarah: CrewMember = CrewMember(
         member_id="CM001",
         name="Sarah Connor",
@@ -209,7 +205,7 @@ def main() -> None:
             destination="Moon",
             launch_date="2024-07-01T08:00:00",  # type: ignore[arg-type]
             duration_days=30,
-            crew=[cadet_bob],  # No captain or commander
+            crew=[cadet_bob],
             budget_millions=100.0,
         )
     except ValidationError as error:

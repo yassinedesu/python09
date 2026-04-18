@@ -142,7 +142,7 @@ def main() -> None:
             contact_type=ContactType.TELEPATHIC,
             signal_strength=6.2,
             duration_minutes=30,
-            witness_count=1,  # Invalid: telepathic requires >= 3
+            witness_count=1,
             is_verified=False,
         )
     except ValidationError as error:

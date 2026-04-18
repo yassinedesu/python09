@@ -121,7 +121,7 @@ def main() -> None:
         SpaceStation(
             station_id="BAD001",
             name="Overcrowded Station",
-            crew_size=25,  # Invalid: exceeds maximum of 20
+            crew_size=25,
             power_level=80.0,
             oxygen_level=90.0,
             last_maintenance="2024-01-15T10:30:00",  # type: ignore[arg-type]
